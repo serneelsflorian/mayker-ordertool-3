@@ -100,15 +100,28 @@ jobs:
       - name: Install frontend
         run: npm ci
         working-directory: frontend
+      - name: Install E2E dependencies
+        run: npm ci
+        working-directory: e2e
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
         working-directory: e2e
       - name: Build frontend
         run: npm run build
         working-directory: frontend
+      - name: Run database migrations
+        run: alembic upgrade head
+        working-directory: backend
       - name: Start backend
         run: uvicorn app.main:app --host 0.0.0.0 --port 8000 &
         working-directory: backend
+      - name: Wait for backend
+        run: |
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:8000/health && exit 0
+            sleep 1
+          done
+          echo "Backend did not become ready in time" && exit 1
       - name: Run Playwright tests
         run: npx playwright test
         working-directory: e2e
