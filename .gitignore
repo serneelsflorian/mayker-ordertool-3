@@ -29,6 +29,7 @@ Thumbs.db
 e2e/uat/screenshots/
 e2e/uat/reports/
 coverage/
+.coverage
 .pytest_cache/
 htmlcov/
 
