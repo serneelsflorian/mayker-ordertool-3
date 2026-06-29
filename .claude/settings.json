@@ -3,5 +3,25 @@
   "extraKnownMarketplaces": {
     "bemayker": { "source": { "source": "github", "repo": "bemayker/claude-marketplace" } }
   },
-  "enabledPlugins": { "claude-dev@bemayker": true }
+  "enabledPlugins": { "claude-dev@bemayker": true },
+  "permissions": {
+    "allow": [
+      "Bash(git *)",
+      "Bash(gh *)",
+      "Bash(pip install *)",
+      "Bash(npm *)",
+      "Bash(npx *)",
+      "Bash(uvicorn *)",
+      "Bash(pytest *)",
+      "Bash(python *)",
+      "Bash(python3 *)",
+      "Bash(docker *)",
+      "Bash(docker-compose *)",
+      "Bash(mkdir -p *)",
+      "Bash(ls *)",
+      "Bash(cat *)",
+      "Bash(grep *)",
+      "Bash(find . *)"
+    ]
+  }
 }
