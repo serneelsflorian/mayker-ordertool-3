@@ -16,10 +16,17 @@ app = FastAPI(
     description="Group food-ordering API for Mayker Order Tool",
 )
 
-# CORS middleware
+# CORS middleware — origins resolved lazily so unit-test imports don't require DATABASE_URL
+def _get_cors_origins() -> list[str]:
+    try:
+        return get_settings().CORS_ORIGINS
+    except Exception:
+        return ["http://localhost:5173"]
+
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=get_settings().CORS_ORIGINS,
+    allow_origins=_get_cors_origins(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
