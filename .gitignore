@@ -28,7 +28,11 @@ Thumbs.db
 # Test artifacts
 e2e/uat/screenshots/
 e2e/uat/reports/
+e2e/test-results/
+e2e/playwright-report/
 coverage/
+.coverage
+coverage.xml
 .pytest_cache/
 htmlcov/
 

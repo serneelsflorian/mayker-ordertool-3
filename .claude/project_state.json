@@ -1,0 +1,61 @@
+{
+  "issue_tracker": {
+    "provider": "clickup",
+    "mcp_server": "clickup",
+    "project": { "id": "901523929704", "name": "Backlog" },
+    "team": { "id": "901511195692", "name": "DEMO - Order tool" }
+  },
+  "git_provider": {
+    "provider": "github",
+    "repository": "serneelsflorian/mayker-ordertool-3"
+  },
+  "status_mapping": {
+    "todo": "to do",
+    "planning": "planning",
+    "plan_review": "planning review",
+    "ready_for_build": "ready for build",
+    "in_progress": "in progress",
+    "in_review": "in review",
+    "done": "done"
+  },
+  "reverse_status_mapping": {
+    "to do": "todo",
+    "planning": "planning",
+    "planning review": "plan_review",
+    "ready for build": "ready_for_build",
+    "in progress": "in_progress",
+    "in review": "in_review",
+    "done": "done",
+    "complete": "done"
+  },
+  "features": {
+    "STORY-1": {
+      "external_id": "86ca9md8h",
+      "external_identifier": "Story 1: Admin starts a group order and enters the menu"
+    },
+    "STORY-2": {
+      "external_id": "86ca9mdbu",
+      "external_identifier": "Story 2: Admin generates a shareable link"
+    },
+    "STORY-3": {
+      "external_id": "86ca9mdf4",
+      "external_identifier": "Story 3: A guest joins via the link and adds items"
+    },
+    "STORY-4": {
+      "external_id": "86ca9mdh1",
+      "external_identifier": "Story 4: Admin closes the order"
+    },
+    "STORY-5": {
+      "external_id": "86ca9mdkk",
+      "external_identifier": "Story 5: Admin exports the consolidated order"
+    },
+    "STORY-6": {
+      "external_id": "86ca9mdq6",
+      "external_identifier": "Story 6: Admin emails the order overview (demo prank)"
+    },
+    "STORY-7": {
+      "external_id": "86ca9pmhx",
+      "external_identifier": "Story 7: Guest submits their order"
+    }
+  }
+}
