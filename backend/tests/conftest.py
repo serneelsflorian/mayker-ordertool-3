@@ -4,7 +4,7 @@ from collections.abc import AsyncGenerator
 import pytest
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession, async_sessionmaker, create_async_engine
 
 from app.main import app
 from app.db.session import get_db
@@ -51,20 +51,46 @@ def anyio_backend():
     return "asyncio"
 
 
+@pytest_asyncio.fixture(scope="function")
+async def db_connection(engine, run_migrations) -> AsyncGenerator[AsyncConnection, None]:
+    """Function-scoped connection that wraps each test in a rolled-back transaction."""
+    async with engine.connect() as connection:
+        await connection.begin()
+        yield connection
+        await connection.rollback()
+
+
 @pytest_asyncio.fixture(scope="module")
 async def client(engine, run_migrations) -> AsyncGenerator[AsyncClient, None]:
-    """Session-scoped HTTP test client using the real database."""
-    session_factory = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+    """Module-scoped HTTP test client.
 
-    async def override_get_db() -> AsyncGenerator[AsyncSession, None]:
-        async with session_factory() as session:
-            yield session
-
-    app.dependency_overrides[get_db] = override_get_db
-
+    Each test gets its own rolled-back transaction via the ``db_connection``
+    fixture which overrides ``get_db`` for the duration of that test.
+    The module-scoped client is kept so the ASGI app does not need to be
+    recreated on every test.
+    """
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://test"
     ) as ac:
         yield ac
 
     app.dependency_overrides.clear()
+
+
+@pytest_asyncio.fixture(scope="function", autouse=False)
+async def isolated_client(
+    client: AsyncClient, db_connection: AsyncConnection
+) -> AsyncGenerator[AsyncClient, None]:
+    """Yield the module client with ``get_db`` overridden to use the per-test
+    rolled-back connection, providing transaction-level test isolation."""
+    session_factory = async_sessionmaker(
+        bind=db_connection, class_=AsyncSession, expire_on_commit=False
+    )
+
+    async def override_get_db() -> AsyncGenerator[AsyncSession, None]:
+        async with session_factory() as session:
+            yield session
+
+    app.dependency_overrides[get_db] = override_get_db
+    yield client
+    app.dependency_overrides.pop(get_db, None)

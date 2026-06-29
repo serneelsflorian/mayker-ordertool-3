@@ -8,13 +8,17 @@ interface UseOrderResult {
   addItem: (item: MenuItemCreate) => Promise<void>;
   removeItem: (itemId: string) => Promise<void>;
   loading: boolean;
+  isSubmitting: boolean;
   error: string | null;
+  mutationError: string | null;
 }
 
 export function useOrder(orderId: string): UseOrderResult {
   const [order, setOrder] = useState<OrderRead | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [mutationError, setMutationError] = useState<string | null>(null);
 
   const fetchOrder = useCallback(async () => {
     setLoading(true);
@@ -35,25 +39,41 @@ export function useOrder(orderId: string): UseOrderResult {
 
   const addItem = useCallback(
     async (item: MenuItemCreate) => {
-      const created = await addMenuItem(orderId, item);
-      setOrder((prev) => {
-        if (!prev) return prev;
-        return { ...prev, menu_items: [...prev.menu_items, created] };
-      });
+      setMutationError(null);
+      setIsSubmitting(true);
+      try {
+        const created = await addMenuItem(orderId, item);
+        setOrder((prev) => {
+          if (!prev) return prev;
+          return { ...prev, menu_items: [...prev.menu_items, created] };
+        });
+      } catch (err) {
+        setMutationError(err instanceof Error ? err.message : 'Failed to add item');
+      } finally {
+        setIsSubmitting(false);
+      }
     },
     [orderId],
   );
 
   const removeItem = useCallback(
     async (itemId: string) => {
-      await removeMenuItem(orderId, itemId);
-      setOrder((prev) => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          menu_items: prev.menu_items.filter((item) => item.id !== itemId),
-        };
-      });
+      setMutationError(null);
+      setIsSubmitting(true);
+      try {
+        await removeMenuItem(orderId, itemId);
+        setOrder((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            menu_items: prev.menu_items.filter((item) => item.id !== itemId),
+          };
+        });
+      } catch (err) {
+        setMutationError(err instanceof Error ? err.message : 'Failed to remove item');
+      } finally {
+        setIsSubmitting(false);
+      }
     },
     [orderId],
   );
@@ -64,6 +84,8 @@ export function useOrder(orderId: string): UseOrderResult {
     addItem,
     removeItem,
     loading,
+    isSubmitting,
     error,
+    mutationError,
   };
 }

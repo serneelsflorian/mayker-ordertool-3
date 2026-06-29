@@ -10,7 +10,7 @@ import { TEXT } from '../config/constants';
 
 export function OrderSetupPage() {
   const { id } = useParams<{ id: string }>();
-  const { order, menuItems, addItem, removeItem, loading, error } = useOrder(id ?? '');
+  const { order, menuItems, addItem, removeItem, loading, isSubmitting, error, mutationError } = useOrder(id ?? '');
 
   if (loading) {
     return (
@@ -42,7 +42,16 @@ export function OrderSetupPage() {
             <CardTitle>Menu items</CardTitle>
           </CardHeader>
           <CardContent className="space-y-5">
-            <MenuItemForm onAdd={addItem} />
+            <MenuItemForm onAdd={addItem} isSubmitting={isSubmitting} />
+            {mutationError && (
+              <p
+                data-testid="order-mutation-error"
+                className="text-xs text-brand-coral"
+                role="alert"
+              >
+                {mutationError}
+              </p>
+            )}
             <Separator />
             <MenuItemList items={menuItems} onRemove={removeItem} />
           </CardContent>

@@ -127,3 +127,18 @@ async def test_remove_item_not_found(service, mock_item_repo, mock_session):
         await service.remove_item(mock_session, uuid.uuid4(), uuid.uuid4())
 
     assert exc_info.value.status_code == 404
+
+
+async def test_remove_item_cross_order_raises_not_found(service, mock_item_repo, mock_session):
+    """remove_item should raise NotFoundError when item belongs to a different order."""
+    item_id = uuid.uuid4()
+    other_order_id = uuid.uuid4()
+    target_order_id = uuid.uuid4()
+    # The item exists but belongs to a different order
+    existing_item = MenuItem(id=item_id, order_id=other_order_id, name="Lasagne")
+    mock_item_repo.get_by_id.return_value = existing_item
+
+    with pytest.raises(NotFoundError) as exc_info:
+        await service.remove_item(mock_session, target_order_id, item_id)
+
+    assert exc_info.value.status_code == 404

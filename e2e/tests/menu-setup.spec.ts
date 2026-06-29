@@ -133,4 +133,25 @@ test.describe('STORY-1: Admin starts a group order', () => {
     await expect(page.getByTestId('generatelink-button')).toBeEnabled();
     await expect(page.getByTestId('generatelink-helper')).not.toBeVisible();
   });
+
+  test('AC6 – removing the last item disables the generate link button again', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForURL(/\/order\/.+/);
+
+    // Add one item
+    await page.getByTestId('menuitemform-name').fill('Focaccia');
+    await page.getByTestId('menuitemform-add').click();
+    const row = page.locator('[data-testid^="menuitem-row-"]').first();
+    await expect(row).toBeVisible();
+
+    // Retrieve the item id and click its remove button
+    const rowTestId = await row.getAttribute('data-testid');
+    const itemId = rowTestId?.replace('menuitem-row-', '') ?? '';
+    await page.getByTestId(`menuitem-remove-${itemId}`).click();
+
+    // Item gone → button disabled again, helper text visible again
+    await expect(row).not.toBeVisible({ timeout: 5000 });
+    await expect(page.getByTestId('generatelink-button')).toBeDisabled();
+    await expect(page.getByTestId('generatelink-helper')).toBeVisible();
+  });
 });

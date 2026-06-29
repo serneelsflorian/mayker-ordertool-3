@@ -1,6 +1,6 @@
 from fastapi import FastAPI
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import ValidationError as PydanticValidationError
 
 from app.core.config import get_settings
 from app.core.exception_handlers import app_exception_handler, request_validation_exception_handler
@@ -34,7 +34,7 @@ app.add_middleware(
 
 # Exception handlers
 app.add_exception_handler(AppException, app_exception_handler)  # type: ignore[arg-type]
-app.add_exception_handler(PydanticValidationError, request_validation_exception_handler)  # type: ignore[arg-type]
+app.add_exception_handler(RequestValidationError, request_validation_exception_handler)  # type: ignore[arg-type]
 
 # Routers
 app.include_router(orders.router)

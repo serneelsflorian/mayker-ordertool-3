@@ -1,8 +1,8 @@
 import logging
 
 from fastapi import Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from pydantic import ValidationError as PydanticValidationError
 
 from app.core.exceptions import AppException
 
@@ -23,11 +23,15 @@ async def app_exception_handler(request: Request, exc: AppException) -> JSONResp
 
 
 async def request_validation_exception_handler(
-    request: Request, exc: PydanticValidationError
+    request: Request, exc: RequestValidationError
 ) -> JSONResponse:
     logger.debug("RequestValidationError at %s: %s", request.url.path, exc.errors())
     details = [
-        {"loc": list(err["loc"]), "msg": err["msg"], "type": err["type"]}
+        {
+            "field": err["loc"][-1] if err["loc"] else None,
+            "message": err["msg"],
+            "type": err["type"],
+        }
         for err in exc.errors()
     ]
     return JSONResponse(

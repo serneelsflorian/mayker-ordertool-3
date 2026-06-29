@@ -38,17 +38,29 @@ async def test_add_menu_item_without_price_returns_201(client: AsyncClient, orde
 
 
 async def test_add_menu_item_blank_name_returns_422(client: AsyncClient, order_id: str):
-    """POST /api/orders/{id}/menu-items should return 422 for blank name."""
+    """POST /api/orders/{id}/menu-items should return 422 for blank name with error envelope."""
     payload = {"name": "   "}
     response = await client.post(f"/api/orders/{order_id}/menu-items", json=payload)
     assert response.status_code == 422
+    body = response.json()
+    assert body["error"]["code"] == "validation_error"
+    assert isinstance(body["error"]["details"], list)
+    assert len(body["error"]["details"]) > 0
+    fields = [d["field"] for d in body["error"]["details"]]
+    assert "name" in fields
 
 
 async def test_add_menu_item_negative_price_returns_422(client: AsyncClient, order_id: str):
-    """POST /api/orders/{id}/menu-items should return 422 for negative price."""
+    """POST /api/orders/{id}/menu-items should return 422 for negative price with error envelope."""
     payload = {"name": "Espresso", "price": "-1.00"}
     response = await client.post(f"/api/orders/{order_id}/menu-items", json=payload)
     assert response.status_code == 422
+    body = response.json()
+    assert body["error"]["code"] == "validation_error"
+    assert isinstance(body["error"]["details"], list)
+    assert len(body["error"]["details"]) > 0
+    fields = [d["field"] for d in body["error"]["details"]]
+    assert "price" in fields
 
 
 async def test_add_menu_item_missing_order_returns_404(client: AsyncClient):
