@@ -19,7 +19,6 @@ async def create_order(
 ) -> OrderCreateResponse:
     """Create a new group order."""
     order = await _order_service.create_order(session)
-    await session.commit()
     return OrderCreateResponse(
         id=order.id,
         status=order.status,

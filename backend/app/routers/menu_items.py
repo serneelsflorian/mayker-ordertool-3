@@ -24,7 +24,6 @@ async def add_menu_item(
 ) -> MenuItemRead:
     """Add a menu item to an order."""
     item = await _menu_item_service.add_item(session, order_id, payload)
-    await session.commit()
     return MenuItemRead.model_validate(item)
 
 
@@ -39,4 +38,3 @@ async def remove_menu_item(
 ) -> None:
     """Remove a menu item from an order."""
     await _menu_item_service.remove_item(session, order_id, item_id)
-    await session.commit()

@@ -15,9 +15,7 @@ export function GenerateLinkSection({ menuItemCount }: GenerateLinkSectionProps)
         data-testid="generatelink-button"
         disabled={isDisabled}
         className="w-full sm:w-auto"
-        onClick={() => {
-          // STORY-2 will implement the actual link generation
-        }}
+        onClick={() => {}}
       >
         <Link className="h-4 w-4" aria-hidden="true" />
         {TEXT.GENERATE_LINK}

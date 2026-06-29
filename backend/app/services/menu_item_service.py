@@ -11,9 +11,6 @@ from app.schemas.menu_item import MenuItemCreate
 
 logger = logging.getLogger(__name__)
 
-_order_repository = OrderRepository()
-_menu_item_repository = MenuItemRepository()
-
 
 class MenuItemService:
     def __init__(
@@ -21,8 +18,8 @@ class MenuItemService:
         order_repository: OrderRepository | None = None,
         menu_item_repository: MenuItemRepository | None = None,
     ) -> None:
-        self._order_repo = order_repository or _order_repository
-        self._item_repo = menu_item_repository or _menu_item_repository
+        self._order_repo = order_repository if order_repository is not None else OrderRepository()
+        self._item_repo = menu_item_repository if menu_item_repository is not None else MenuItemRepository()
 
     async def add_item(
         self,
@@ -42,6 +39,7 @@ class MenuItemService:
             category=payload.category,
         )
         created = await self._item_repo.add(session, item)
+        await session.commit()
         logger.info("Added menu item id=%s to order id=%s", created.id, order_id)
         return created
 
@@ -57,4 +55,5 @@ class MenuItemService:
             raise NotFoundError(f"Menu item {item_id} not found in order {order_id}")
 
         await self._item_repo.delete(session, item)
+        await session.commit()
         logger.info("Removed menu item id=%s from order id=%s", item_id, order_id)
