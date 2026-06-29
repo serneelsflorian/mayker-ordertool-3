@@ -30,6 +30,7 @@ e2e/uat/screenshots/
 e2e/uat/reports/
 coverage/
 .coverage
+coverage.xml
 .pytest_cache/
 htmlcov/
 
