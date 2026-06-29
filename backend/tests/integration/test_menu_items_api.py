@@ -4,7 +4,7 @@ import pytest
 from httpx import AsyncClient
 
 
-pytestmark = pytest.mark.usefixtures("run_migrations")
+pytestmark = pytest.mark.asyncio
 
 
 @pytest.fixture
